@@ -28,12 +28,13 @@ runs:
       with:
         path: |
           /usr/local/bin/circom
-      key: ${{ runner.os }}-circom
+        key: ${{ runner.os }}-circom
       
     - name: Install Circom
       if: ${{ steps.cache-circom.outputs.cache-hit != 'true' }}
       shell: bash
       working-directory: /usr/local/bin
-      run: wget "https://github.com/iden3/circom/releases/download/v2.1.6/circom-linux-amd64"
-      run: chmod +x "./circom-linux-amd64"
-      run: mv ./circom-linux-amd64 ./circom
+      run: |
+        wget "https://github.com/iden3/circom/releases/download/v2.1.6/circom-linux-amd64"
+        chmod +x "./circom-linux-amd64"
+        mv ./circom-linux-amd64 ./circom
