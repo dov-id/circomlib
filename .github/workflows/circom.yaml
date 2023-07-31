@@ -26,7 +26,7 @@ jobs:
         with:
           path: |
             ./circuits
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./circuits') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./circuits') }}
 
       - name: Circuits compiling
         if: ${{ steps.cache-circuits.outputs.cache-hit != 'true' }}
