@@ -3,13 +3,12 @@ pragma circom 2.0.2;
 include "../node_modules/circomlib/circuits/mimcsponge.circom";
 include "../node_modules/circomlib/circuits/bitify.circom";
 include "./eth_addr.circom";
+include "./utils/in.circom"
 
 /*
   Inputs:
-  - addr1 (pub)
-  - addr2 (pub)
-  - addr3 (pub)
-  - msg (pub)
+  - signerList (pub)
+  - msg        (pub)
   - privkey
 
   Intermediate values:
@@ -20,23 +19,18 @@ include "./eth_addr.circom";
   
   Prove:
   - PrivKeyToAddr(privkey) == myAddr
-  - (x - addr1)(x - addr2)(x - addr3) == 0
-  - msgAttestation == mimc(msg, privkey)
+  - myAddr in signerList
 */
 
-template Main(n, k) {
+template Main(n, k, m) {
     assert(n * k >= 256);
     assert(n * (k-1) < 256);
 
     signal input privkey[k];
-    signal input addr1;
-    signal input addr2;
-    signal input addr3;
+    signal input signerList[m]
     signal input msg;
 
     signal myAddr;
-
-    signal output msgAttestation;
 
     // check that privkey properly represents a 256-bit number
     component n2bs[k];
@@ -53,18 +47,12 @@ template Main(n, k) {
     myAddr <== privToAddr.addr;
 
     // verify address is one of the provided
-    signal temp;
-    temp <== (myAddr - addr1) * (myAddr - addr2);
-    0 === temp * (myAddr - addr3);
-    
-    // produce signature
-    component mimcAttestation = MiMCSponge(k+1, 220, 1);
-    mimcAttestation.ins[0] <== msg;
-    for (var i = 0; i < k; i++) {
-        mimcAttestation.ins[i+1] <== privkey[i];
+    component inComp = IN(m);
+    inComp.in <== myAddr;
+    for(var i = 0; i < m; i++){
+        inComp.value[i] <== signerList[i];
     }
-    mimcAttestation.k <== 0;
-    msgAttestation <== mimcAttestation.outs[0];
+    inComp.out === 1;
 }
 
-component main {public [addr1, addr2, addr3, msg]} = Main(64, 4);
+component main {public [signerList, msg]} = Main(64, 4, 10);
