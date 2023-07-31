@@ -3,7 +3,7 @@ pragma circom 2.0.2;
 include "../node_modules/circomlib/circuits/mimcsponge.circom";
 include "../node_modules/circomlib/circuits/bitify.circom";
 include "./eth_addr.circom";
-include "./utils/in.circom"
+include "./utils/in.circom";
 
 /*
   Inputs:
@@ -27,7 +27,7 @@ template Main(n, k, m) {
     assert(n * (k-1) < 256);
 
     signal input privkey[k];
-    signal input signerList[m]
+    signal input signerList[m];
     signal input msg;
 
     signal myAddr;
