@@ -30,4 +30,4 @@ jobs:
 
       - name: Circuits compiling
         if: ${{ steps.cache-circuits.outputs.cache-hit != 'true' }}
-        uses: ./scripts/compile-circuit.sh groupsig
+        run: ./scripts/compile-circuit.sh groupsig
