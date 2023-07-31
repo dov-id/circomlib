@@ -1,0 +1,33 @@
+name: "circuits compiling"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Caching Circuits
+        id: cache-circuits
+        env:
+          cache-name: cache-circuits
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./circuits
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./circuits') }}
+
+      - name: Circuits compiling
+        if: ${{ steps.cache-circuits.outputs.cache-hit != 'true' }}
+        uses: ./scripts/compile-circuit.sh groupsig
